@@ -1,37 +1,38 @@
 #!/bin/bash
-
+ 
 make myinit
-
+ 
 touch /tmp/in
 touch /tmp/out
 touch /tmp/myconf
-
-echo /bin/sleep 5 /tmp/in /tmp/out >> /tmp/myconf
+ 
+echo /bin/sleep 5 /tmp/in /tmp/out > /tmp/myconf
 echo /bin/sleep 10 /tmp/in /tmp/out >> /tmp/myconf
 echo /bin/sleep 15 /tmp/in /tmp/out >> /tmp/myconf
-
+ 
 ./myinit /tmp/myconf
-
+ 
 sleep 1
-
-echo -------- >> result.txt
-ps -ef | grep "/bin/sleep 5" >> result.txt
-ps -ef | grep "/bin/sleep 10" >> result.txt
-ps -ef | grep "/bin/sleep 7" >> result.txt
+ 
+echo -e "---RUNME started... checking 3 processes---" > result.txt
+ps -ef | grep "/bin/sleep" | grep -v grep >> result.txt
+ 
 pkill -f "/bin/sleep 5"
-
+ 
+echo -e "\n---One process has been killed... checking he's resurrected---" >> result.txt
+ps -ef | grep "/bin/sleep" | grep -v grep >> result.txt
+ 
 sleep 15
-
-echo /bin/sleep 5 /tmp/in /tmp/out > /tmp/myconf
-
+ 
+echo /bin/sleep 7 /tmp/in /tmp/out > /tmp/myconf
+ 
 killall -HUP myinit
-
-echo -------- >> result.txt
-
-ps -ef | grep "/bin/sleep 1" >> result.txt
-ps -ef | grep "/bin/sleep 3" >> result.txt
-
-echo LOG >> result.txt
-
+ 
+echo -e "\n---SIGHUP has been sent... checking 1 process---" >> result.txt
+ 
+ps -ef | grep "/bin/sleep" | grep -v grep >> result.txt
+ 
+echo -e "\n---LOGS---" >> result.txt
+ 
 cat /tmp/myinit.log >> result.txt
 killall myinit
